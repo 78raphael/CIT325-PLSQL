@@ -9,7 +9,6 @@
 @/home/student/Data/cit325/lib/cleanup_oracle.sql
 @/home/student/Data/cit325/lib/Oracle12cPLSQLCode/Introduction/create_video_store.sql
 
-
 -- Open log file.
 SPOOL apply_plsql_lab11.txt
 
@@ -167,7 +166,6 @@ BEGIN
 END;
 /
 
-
 /* Query the logger table. */
 COL logger_id       FORMAT 9999 HEADING "Logger|ID #"
 COL old_item_id     FORMAT 9999 HEADING "Old|Item|ID #"
@@ -184,6 +182,7 @@ FROM   logger l;
 /*  ===================================================================================  */
 
 CREATE OR REPLACE PACKAGE manage_item AS
+
   PROCEDURE item_insert(
     pv_new_item_id             NUMBER,
     pv_new_item_barcode        VARCHAR2,
@@ -198,7 +197,7 @@ CREATE OR REPLACE PACKAGE manage_item AS
     pv_new_last_updated_by     NUMBER,
     pv_new_last_update_date    DATE,
     pv_new_text_file_name      VARCHAR2
-  ),
+  );
 
   PROCEDURE item_insert(
     pv_old_item_id             NUMBER,
@@ -424,7 +423,6 @@ CREATE OR REPLACE PACKAGE BODY manage_item AS
       pv_new_text_file_name
      );
   END item_insert;
-
 
 END manage_item;
 /

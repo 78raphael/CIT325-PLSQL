@@ -228,27 +228,28 @@ CREATE OR REPLACE PACKAGE manage_item AS
     pv_new_text_file_name      VARCHAR2
   );
 
-  -- PROCEDURE item_insert(
-  --   pv_old_item_id             NUMBER,
-  --   pv_old_item_barcode        VARCHAR2,
-  --   pv_old_item_type           NUMBER,
-  --   pv_old_item_title          VARCHAR2,
-  --   pv_old_item_subtitle       VARCHAR2,
-  --   pv_old_item_rating         VARCHAR2,
-  --   pv_old_item_rating_agency  VARCHAR2,
-  --   pv_old_item_release_date   DATE,
-  --   pv_old_created_by          NUMBER,
-  --   pv_old_creation_date       DATE,
-  --   pv_old_last_updated_by     NUMBER,
-  --   pv_old_last_update_date    DATE,
-  --   pv_old_text_file_name      VARCHAR2
-  -- );
+  PROCEDURE item_insert(
+    pv_old_item_id             NUMBER,
+    pv_old_item_barcode        VARCHAR2,
+    pv_old_item_type           NUMBER,
+    pv_old_item_title          VARCHAR2,
+    pv_old_item_subtitle       VARCHAR2,
+    pv_old_item_rating         VARCHAR2,
+    pv_old_item_rating_agency  VARCHAR2,
+    pv_old_item_release_date   DATE,
+    pv_old_created_by          NUMBER,
+    pv_old_creation_date       DATE,
+    pv_old_last_updated_by     NUMBER,
+    pv_old_last_update_date    DATE,
+    pv_old_text_file_name      VARCHAR2
+  );
 
 END manage_item;
 /
 
 CREATE OR REPLACE PACKAGE BODY manage_item AS
 
+  /*  ==========  INSERT  ==========  */
   PROCEDURE item_insert(
     pv_new_item_id             NUMBER,
     pv_new_item_barcode        VARCHAR2,
@@ -300,7 +301,7 @@ CREATE OR REPLACE PACKAGE BODY manage_item AS
       new_text_file_name
     )
     VALUES
-    ( logger_s.NEXTVAL,
+    ( lv_logger_id,
       NULL,
       NULL,
       NULL,
@@ -330,6 +331,7 @@ CREATE OR REPLACE PACKAGE BODY manage_item AS
      );
   END item_insert;
 
+  /*  ==========  UPDATE  ==========  */
   PROCEDURE item_insert(
     pv_old_item_id             NUMBER,
     pv_old_item_barcode        VARCHAR2,
@@ -394,7 +396,7 @@ CREATE OR REPLACE PACKAGE BODY manage_item AS
       new_text_file_name
     )
     VALUES
-    ( logger_s.NEXTVAL,
+    ( lv_logger_id,
       pv_old_item_id,
       pv_old_item_barcode,
       pv_old_item_type,
@@ -424,6 +426,88 @@ CREATE OR REPLACE PACKAGE BODY manage_item AS
      );
   END item_insert;
 
+  /*  ==========  DELETE  ==========  */
+  PROCEDURE item_insert(
+    pv_old_item_id             NUMBER,
+    pv_old_item_barcode        VARCHAR2,
+    pv_old_item_type           NUMBER,
+    pv_old_item_title          VARCHAR2,
+    pv_old_item_subtitle       VARCHAR2,
+    pv_old_item_rating         VARCHAR2,
+    pv_old_item_rating_agency  VARCHAR2,
+    pv_old_item_release_date   DATE,
+    pv_old_created_by          NUMBER,
+    pv_old_creation_date       DATE,
+    pv_old_last_updated_by     NUMBER,
+    pv_old_last_update_date    DATE,
+    pv_old_text_file_name      VARCHAR2
+  ) IS
+
+    lv_logger_id  NUMBER;
+
+  BEGIN
+    lv_logger_id := logger_s.NEXTVAL;
+
+    INSERT INTO logger
+    ( logger_id,
+      old_item_id,
+      old_item_barcode,
+      old_item_type,
+      old_item_title,
+      old_item_subtitle,
+      old_item_rating,
+      old_item_rating_agency,
+      old_item_release_date,
+      old_created_by,
+      old_creation_date,
+      old_last_updated_by,
+      old_last_update_date,
+      old_text_file_name,
+      new_item_id,
+      new_item_barcode,
+      new_item_type,
+      new_item_title,
+      new_item_subtitle,
+      new_item_rating,
+      new_item_rating_agency,
+      new_item_release_date,
+      new_created_by,
+      new_creation_date,
+      new_last_updated_by,
+      new_last_update_date,
+      new_text_file_name
+    )
+    VALUES
+    ( lv_logger_id,
+      pv_old_item_id,
+      pv_old_item_barcode,
+      pv_old_item_type,
+      pv_old_item_title,
+      pv_old_item_subtitle,
+      pv_old_item_rating,
+      pv_old_item_rating_agency,
+      pv_old_item_release_date,
+      pv_old_created_by,
+      pv_old_creation_date,
+      pv_old_last_updated_by,
+      pv_old_last_update_date,
+      pv_old_text_file_name,
+      NULL,
+      NULL,
+      NULL,
+      NULL,
+      NULL,
+      NULL,
+      NULL,
+      NULL,
+      NULL,
+      NULL,
+      NULL,
+      NULL,
+      NULL
+     );
+  END item_insert;
+
 END manage_item;
 /
 
@@ -437,7 +521,7 @@ BEGIN
   /* Read the dynamic cursor. */
   FOR i IN get_row LOOP
 
-      manage_item.item_insert(
+    manage_item.item_insert(
       pv_new_item_id => i.item_id,
       pv_new_item_barcode => i.item_barcode,
       pv_new_item_type => i.item_type,
@@ -482,6 +566,22 @@ BEGIN
       pv_new_text_file_name =>i.text_file_name
     );
 
+    manage_item.item_insert(
+      pv_old_item_id => i.item_id,
+      pv_old_item_barcode => i.item_barcode,
+      pv_old_item_type => i.item_type,
+      pv_old_item_title => i.item_title || '-Deleted',
+      pv_old_item_subtitle => i.item_subtitle,
+      pv_old_item_rating => i.item_rating,
+      pv_old_item_rating_agency => i.item_rating_agency,
+      pv_old_item_release_date => i.item_release_date,
+      pv_old_created_by => i.created_by,
+      pv_old_creation_date => i.creation_date,
+      pv_old_last_updated_by => i.last_updated_by,
+      pv_old_last_update_date => i.last_update_date,
+      pv_old_text_file_name => i.text_file_name
+    );
+
   END LOOP;
 END;
 /
@@ -506,6 +606,30 @@ FROM   logger l;
 
 /*  ===================================================================================  */
 
+-- CREATE OR REPLACE TRIGGER item_trig
+-- BEFORE INSERT OR UPDATE OF 
+
+-- BEGIN
+--   IF INSERTING THEN
+
+
+--   ELSIF UPDATING THEN
+
+
+
+--   END IF;
+
+
+-- END item_trig;
+
+
+-- CREATE OR REPLACE TRIGGER item_delete_trig
+-- DELETE
+
+-- BEGIN
+
+-- END item_delete_trig;
+/
 
 /*  ===================================================================================  */
 
